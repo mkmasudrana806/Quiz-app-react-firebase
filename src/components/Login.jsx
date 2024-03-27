@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import classes from "../styles/Login.module.css";
 import Button from "./Button";
@@ -14,24 +14,20 @@ const Login = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const previousLocation = location.state?.from;
 
   const { login } = useAuth();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
-    login(email, password)
-      .then((user) => {
-        console.log("current logged in user in login component: " + user);
-        setError("");
-        setLoading(false);
-        navigate("/");
-      })
-      .catch((err) => {
-        console.log("error in login component", err);
-        setLoading(false);
-        setError("Failed to login");
-      });
+    await login(email, password);
+
+    setError("");
+    setLoading(false);
+    navigate(previousLocation? previousLocation : "/");
+     
   };
   return (
     <div>
